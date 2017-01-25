@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "description": "Convert DragonBones for akashic-animation",
   "bin": {
-    "ss2asa": "bin/index.js"
+    "db2asa": "bin/index.js"
   },
   "scripts": {
     "prepublish": "npm run install:typings && gulp compile",
