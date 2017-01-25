@@ -1,6 +1,6 @@
 {
   "name": "@akashic-extension/db2asa",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Convert DragonBones for akashic-animation",
   "bin": {
     "db2asa": "bin/index.js"
