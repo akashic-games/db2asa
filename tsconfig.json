@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "declaration": true,
+    "noLib": true,
+    "noImplicitAny": true,
+    "outDir": "lib",
+    "module": "commonjs"
+  },
+  "filesGlob": [
+    "./typings/**/*.ts",
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "bin"
+  ],
+  "files": [
+    "./node_modules/typescript/lib/lib.es6.d.ts",
+    "./node_modules/@akashic/akashic-engine/lib/main.d.ts",
+    "./node_modules/@akashic-extension/akashic-animation/lib/@akashic-extension/akashic-animation.d.ts",
+    "./typings/index.d.ts",
+    "./src/index.ts"
+  ],
+  "atom": {
+    "rewriteTsconfig": true
+  }
+}

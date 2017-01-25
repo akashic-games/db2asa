@@ -1,0 +1,1 @@
+{"frameRate":24,"version":"4.5","name":"emptyman","isGlobal":0,"armature":[{"frameRate":24,"name":"Armature","skin":[{"name":"","slot":[]}],"slot":[],"ik":[],"type":"Armature","animation":[],"aabb":{"x":0,"y":0,"width":0,"height":0},"defaultActions":[{"gotoAndPlay":""}],"bone":[{"transform":{},"name":"root"}]}]}
