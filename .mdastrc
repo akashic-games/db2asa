@@ -52,7 +52,7 @@
       "ordered-list-marker-value": "ordered",
       "strong-marker": "*",
       "table-cell-padding": "consistent",
-      "table-pipe-alignment": true,
+      "table-pipe-alignment": false,
       "table-pipes": true,
       "unordered-list-marker-style": "*"
     }
