@@ -21,7 +21,7 @@
     "url": "https://github.com/akashic-games/db2asa.git"
   },
   "publishConfig": {
-    "@akashic-extension:registry": "http://registry.npmjs.org/"
+    "@akashic-extension:registry": "https://registry.npmjs.org/"
   },
   "files": [
     "README.md",

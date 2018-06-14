@@ -7,6 +7,8 @@ DragonBonesで作成したアニメーションをakashic-animation形式にコ�
 $ npm install -g @akashic-extension/db2asa
 ```
 
+Akashic Engineの詳細な利用方法については、 [公式ページ](https://akashic-games.github.io/) を参照してください。
+
 ## 使い方
 DragonBonesからJSON形式でexportしたファイルを用意してください。`Image Type`は`Images`のみをサポートしています。texturesディレクトリはJSONファイルと同じディレクトリに配置してください。
 
@@ -123,6 +125,6 @@ asapjファイルと関連するファイルの一覧をasapjファイルのユ�
 ## ライセンス
 本リポジトリは MIT License の元で公開されています。
 詳しくは [LICENSE](./LICENSE) をご覧ください。
- 
+
 ただし、画像ファイルおよび音声ファイルは
 [CC BY 2.1 JP](https://creativecommons.org/licenses/by/2.1/jp/) の元で公開されています。
