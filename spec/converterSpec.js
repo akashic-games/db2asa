@@ -1,6 +1,6 @@
 "use strict"
 
-const C = require("../lib/converter.js");
+const C = require("../bin/converter.js");
 
 describe("C.", function () {
 

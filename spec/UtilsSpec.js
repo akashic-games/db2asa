@@ -1,6 +1,6 @@
 "use strict"
 
-const U = require("../lib/Utils.js");
+const U = require("../bin/Utils.js");
 
 describe("Utils", function() {
     describe("Logger", function() {
