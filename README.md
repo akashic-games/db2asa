@@ -10,7 +10,8 @@ $ npm install -g @akashic-extension/db2asa
 Akashic Engineの詳細な利用方法については、 [公式ページ](https://akashic-games.github.io/) を参照してください。
 
 ## 使い方
-DragonBonesからJSON形式でexportしたファイルを用意してください。`Image Type`は`Images`のみをサポートしています。texturesディレクトリはJSONファイルと同じディレクトリに配置してください。
+DragonBonesからJSON形式でexportしたファイルを用意してください。`Data Version` は `5.0` を選択してください。
+`Image Type`は`Images`のみをサポートしています。texturesディレクトリはJSONファイルと同じディレクトリに配置してください。
 
 ```sh
 $ db2asa exported_dragonbones.json
@@ -111,6 +112,7 @@ asapjファイルと関連するファイルの一覧をasapjファイルのユ�
 ## 制限
 以下をサポートしていません。
 
+* Data Version 5.5 以上のJSONファイル
 * メッシュ
 * 透明度の継承可否設定
 * スロットのカラーアニメーション

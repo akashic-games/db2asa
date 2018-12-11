@@ -122,6 +122,10 @@ export function createConvertPromise(options: Options): Promise<Project> {
 		}
 	).then(
 		(dragonbones: any) => {
+			if (dragonbones.version > 5.0) {
+				throw new Error("Data Version 5.5 is not supported. Please use Data Version 5.0.");
+			}
+
 			return new Promise<any>((resolve: (data: any) => void, reject: (error: any) => void) => {
 				recursive(path.join(pathToProj, "texture"), (err: Error, files: string[]) => {
 					if (! err) {
@@ -193,7 +197,7 @@ export function createConvertPromise(options: Options): Promise<Project> {
 				for (let i = 0; i < armatures.length; i++) {
 					const armature = armatures[i];
 
-					if (armature.ik.length > 0) {
+					if (armature.ik && armature.ik.length > 0) {
 						console.log("IK is not supported, skip. armature name=" + armature.name);
 						continue;
 					}
