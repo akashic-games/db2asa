@@ -6,6 +6,7 @@ import * as fs from "fs-extra";
 import * as sizeof from "image-size";
 import * as recursive from "recursive-readdir";
 import * as U from "./Utils";
+import {DragonBonesData} from "dragonbones-data5.5";
 
 let vlog: U.Logger = undefined;
 
@@ -122,7 +123,10 @@ export function createConvertPromise(options: Options): Promise<Project> {
 		}
 	).then(
 		(dragonbones: any) => {
+			// TODO ここで5.5以上 or 5.0以下でparse処理を分岐さる。
 			if (dragonbones.version > 5.0) {
+				const testData = dragonbones as DragonBonesData;
+				console.log("@@@" + JSON.stringify(testData));
 				throw new Error("Data Version 5.5 is not supported. Please use Data Version 5.0.");
 			}
 

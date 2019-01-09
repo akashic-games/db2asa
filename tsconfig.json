@@ -5,7 +5,11 @@
     "noLib": true,
     "noImplicitAny": true,
     "outDir": "bin",
-    "module": "commonjs"
+    "module": "commonjs",
+    "baseUrl": "./",
+    "paths": {
+      "dragonbones-data5.5": ["typings/db5.5-data"]
+    },
   },
   "filesGlob": [
     "./typings/**/*.ts",
