@@ -198,7 +198,8 @@ function createKeyFrameData(targetBoneData: AnimationTimelineDataCustom, name: s
 	return { data: retData, maxTime: maxTime};
 }
 
-function createAnimation(dbAnimation: AnimationData, fps: number, armature: ArmatureData, isUserDataOutput: boolean): AnimeParams.Animation {
+function createAnimation(dbAnimation: AnimationData, fps: number, armature: ArmatureData, isUserData: boolean): AnimeParams.Animation {
+
 	const bones: BoneData[] = armature.bone;
 	const animation = new AnimeParams.Animation();
 	let maxTime = 0;
@@ -287,7 +288,7 @@ function createAnimation(dbAnimation: AnimationData, fps: number, armature: Arma
 			curveTie.curves.push(curve);
 		});
 
-		if (isUserDataOutput) {
+		if (isUserData) {
 			const dbKeyFrames: any[] = frameData;
 			const curve = new AnimeParams.Curve<any>();
 			curve.attribute = "userData";
