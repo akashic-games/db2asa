@@ -10,6 +10,4 @@ tmp
 .idea
 \#*\#
 *.swp
-typings/globals/
-typings/modules/
-typings/index.d.ts
+typings

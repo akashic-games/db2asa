@@ -5,8 +5,7 @@
     "noLib": true,
     "noImplicitAny": true,
     "outDir": "bin",
-    "module": "commonjs",
-    "baseUrl": "./"
+    "module": "commonjs"
   },
   "filesGlob": [
     "./typings/**/*.ts",
