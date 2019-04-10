@@ -1,6 +1,6 @@
 import * as cmnData from "./CommonData";
 
-interface FrameData {
+export interface FrameData {
 	// The duration of the frame. (Optional property, default: 1)
 	duration?: number;
 
@@ -29,7 +29,7 @@ interface FrameData {
 	zOrder?: number[];
 }
 
-interface AnimationFrameData {
+export interface AnimationFrameData {
 	// The horizontal translate of a bone in the keyframe. (Optional property, default: 0.0)
 	x?: number;
 
@@ -84,9 +84,11 @@ interface AnimationFrameData {
 
 	// The weight of the IK constraint in the frame. (Optional property, default: 1.0)
 	weight?: number;
+
+	// [key: string]: number;
 }
 
-interface AnimationTimelineData {
+export interface AnimationTimelineData {
 	frame?: FrameData[];
 
 	// The name of the bone.
@@ -112,6 +114,11 @@ interface AnimationTimelineData {
 
 	// A list of the color keyframes. (Optional property, default: null)
 	colorFrame?: AnimationFrameData[];
+}
+
+export interface AnimationTimelineDataCustom extends AnimationTimelineData{
+	tempFrame?: cmnData.TransformData[];
+	empty?: boolean;
 }
 
 interface FfdTimelineData {

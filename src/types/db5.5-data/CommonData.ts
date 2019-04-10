@@ -25,6 +25,7 @@ export interface TransformData {
 	skY?: number; // The vertical skew. (Optional property, default: 0.0)
 	scX?: number; // The horizontal scale. (Optional property, default: 1.0)
 	scY?: number; // The vertical scale. (Optional property, default: 1.0)
+	[key:string]: number;
 }
 
 export interface ActionData {

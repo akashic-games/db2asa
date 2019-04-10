@@ -6,7 +6,7 @@ import * as fs from "fs-extra";
 import * as sizeof from "image-size";
 import * as recursive from "recursive-readdir";
 import * as U from "./Utils";
-import {DragonBonesData} from "dragonbones-data5.5";
+import {convertPromise} from "./converterVer55";
 
 let vlog: U.Logger = undefined;
 
@@ -62,12 +62,12 @@ enum Prefix {
 }
 
 // DragonBonesのtransform属性表
-const dbTransformAttributes = [
+export const dbTransformAttributes = [
 	"x", "y", "skX", "scX", "scY"
 ];
 
 // Dragonbonsの属性ごとの合成演算関数テーブル
-const dbTransformComposeOps: {[key: string]: (a: number, b: number) => number} = {
+export const dbTransformComposeOps: {[key: string]: (a: number, b: number) => number} = {
 	"x":   (a: number, b: number) => a + b,
 	"y":   (a: number, b: number) => a + b,
 	"skX": (a: number, b: number) => a + b,
@@ -76,7 +76,7 @@ const dbTransformComposeOps: {[key: string]: (a: number, b: number) => number} =
 };
 
 // DragonBonesのtransform属性の指定がないときに代替する値のテーブル
-const defaultTransformValues: {[key: string]: any} = {
+export const defaultTransformValues: {[key: string]: any} = {
 	x: 0,
 	y: 0,
 	skX: 0,
@@ -85,7 +85,7 @@ const defaultTransformValues: {[key: string]: any} = {
 };
 
 // DragonBonesの属性名を対応するakashic-animationの属性名に変換するテーブル
-const dbAttr2asaAttr: {[key: string]: string} = {
+export const dbAttr2asaAttr: {[key: string]: string} = {
 	x: "tx",
 	y: "ty",
 	skX: "rz",
@@ -93,16 +93,7 @@ const dbAttr2asaAttr: {[key: string]: string} = {
 	scY: "sy"
 };
 
-export function createConvertPromise(options: Options): Promise<Project> {
-
-	const pathToProj = path.dirname(options.projFileName);
-
-	const proj = new Project(options.outputRelatedFileInfo || options.outputComboInfo);
-	proj.name = path.basename(options.projFileName, ".json");
-	if (options.outputComboInfo) {
-		proj.userData.combinationInfo = [];
-	}
-
+export function readFilePromise(options: Options): any {
 	return new Promise<void>(
 		(resolve: () => void, reject: (error: any) => void) => {
 			fs.ensureDir(options.outDir, (err: any) => {
@@ -121,33 +112,28 @@ export function createConvertPromise(options: Options): Promise<Project> {
 				});
 			});
 		}
-	).then(
-		(dragonbones: any) => {
-			// TODO ここで5.5以上 or 5.0以下でparse処理を分岐さる。
-			if (dragonbones.version > 5.0) {
-				const testData = dragonbones as DragonBonesData;
-				console.log("@@@" + JSON.stringify(testData));
-				throw new Error("Data Version 5.5 is not supported. Please use Data Version 5.0.");
-			}
+	);
+}
 
-			return new Promise<any>((resolve: (data: any) => void, reject: (error: any) => void) => {
-				recursive(path.join(pathToProj, "texture"), (err: Error, files: string[]) => {
-					if (! err) {
-						resolve({
-							dragonbones: dragonbones,
-							files: files,
-							textureInfo: {}
-						});
-					} else if ((<any>err).code === "ENOENT") { // "texture" directory is not found
-						resolve({
-							dragonbones: dragonbones,
-							files: [],
-							textureInfo: {}
-						});
-					} else {
-						reject(JSON.stringify(err));
-					}
-				});
+export function createConvertPromise(dragonbones: any, pathToProj: string, proj: Project, options: Options): Promise<Project> {
+	return new Promise<any>(
+		(resolve: (data: any) => void, reject: (error: any) => void) => {
+			recursive(path.join(pathToProj, "texture"), (err: Error, files: string[]) => {
+				if (! err) {
+					resolve({
+						dragonbones: dragonbones,
+						files: files,
+						textureInfo: {}
+					});
+				} else if ((<any>err).code === "ENOENT") { // "texture" directory is not found
+					resolve({
+						dragonbones: dragonbones,
+						files: [],
+						textureInfo: {}
+					});
+				} else {
+					reject(JSON.stringify(err));
+				}
 			});
 		}
 	).then(
@@ -259,20 +245,34 @@ export function createConvertPromise(options: Options): Promise<Project> {
 export function convert(options: Options): void {
 	vlog = new U.Logger(!!options.verbose);
 
-	const convertPromise = createConvertPromise(options);
+	const pathToProj = path.dirname(options.projFileName);
+	const project = new Project(options.outputRelatedFileInfo || options.outputComboInfo);
+	project.name = path.basename(options.projFileName, ".json");
+	if (options.outputComboInfo) {
+		project.userData.combinationInfo = [];
+	}
 
-	convertPromise.then(
-		(proj: Project) => {
-			writeAll(proj, options.outDir, options.prefixes, options.outputRelatedFileInfo);
-		}
-	).catch(
-		(err: any) => {
-			console.log(err.stack);
-		}
-	);
+	Promise.resolve<void>(undefined)
+		.then(() => readFilePromise(options))
+		.then( (data) => {
+			if (data.version > 5.0) {
+				return convertPromise(data, pathToProj, project, options);
+			} else {
+				return createConvertPromise(data, pathToProj, project, options);
+			}
+		})
+		.then(
+			(proj: Project) => {
+				writeAll(proj, options.outDir, options.prefixes, options.outputRelatedFileInfo);
+			}
+		).catch(
+			(err: any) => {
+				console.log(err.stack);
+			}
+		);
 }
 
-function createCellOnSkin(armature: any, skin: Skin): boolean {
+export function createCellOnSkin(armature: any, skin: Skin): boolean {
 	// DBs上でarmatureあたり１つしか(DBs用語の)スキンを作れないはず
 	// そこでarmature.skin[0]のみ用いる
 	const dbSkin = armature.skin[0];
@@ -311,7 +311,7 @@ function createCellOnSkin(armature: any, skin: Skin): boolean {
 	return created;
 }
 
-function getBoneByName(bones: any, name: string): any {
+export function getBoneByName(bones: any, name: string): any {
 	for (let i = 0; i < bones.length; i++) {
 		if (bones[i].name === name) {
 			return bones[i];
@@ -562,7 +562,7 @@ function createCellAnimation(dbSlotAnime: any, armature: any, boneName: string, 
 	return (curve.keyFrames.length > 0) ? curve : undefined;
 }
 
-function getSlotForBone(boneName: string, dbSlots: any[]): any {
+export function getSlotForBone(boneName: string, dbSlots: any[]): any {
 	let dbSlot: any = undefined;
 
 	for (let i = 0; i < dbSlots.length; i++) {
@@ -609,7 +609,7 @@ function getSlotAnimeByBoneName(boneName: string, slotAnimes: any[], dbBones: an
 }
 
 // display nameは部分パスを含んでいる。db2asaではnormalize後の名前を用いる
-function normalizeDisplayName(displayName: string): string {
+export function normalizeDisplayName(displayName: string): string {
 	return path.parse(displayName).name;
 }
 
@@ -632,7 +632,7 @@ function getDisplayImageName(armature: any, boneName: string, displayIndex: numb
 }
 
 // armatureからボーンに配置されるスロット情報を得る
-function getSlotDetailForBone(armature: any, boneName: string): any {
+export function getSlotDetailForBone(armature: any, boneName: string): any {
 	const skin = armature.skin[0]; // 最初のスキンのみ扱う
 
 	const dbSlot = getSlotForBone(boneName, armature.slot);
@@ -648,7 +648,7 @@ function getSlotDetailForBone(armature: any, boneName: string): any {
 }
 
 //
-function getBoneIndex(bones: any, name: string): number {
+export function getBoneIndex(bones: any, name: string): number {
 	for (let i = 0; i < bones.length; i++) {
 		if (bones[i].name === name) {
 			return i;
@@ -658,7 +658,7 @@ function getBoneIndex(bones: any, name: string): number {
 }
 
 // ボーンのZオーダーを取得する。
-function getZOrderForBone(dbSlots: any[], parentBoneName: string): number {
+export function getZOrderForBone(dbSlots: any[], parentBoneName: string): number {
 	// ボーンのZオーダーはボーンに紐づくスロットのZ値を用いる。
 	for (let i = 0; i < dbSlots.length; i++) {
 		if (dbSlots[i].parent === parentBoneName) {
@@ -669,7 +669,7 @@ function getZOrderForBone(dbSlots: any[], parentBoneName: string): number {
 }
 
 // キーフレームから正規化されたアルファ値を取得する。
-function getKeyFrameAlpha(dbKeyFrame: any): number {
+export function getKeyFrameAlpha(dbKeyFrame: any): number {
 	if (dbKeyFrame.color) {
 		if (dbKeyFrame.color.aM !== undefined) {
 			return dbKeyFrame.color.aM / 100;
@@ -679,7 +679,7 @@ function getKeyFrameAlpha(dbKeyFrame: any): number {
 	return 1.0;
 }
 
-function createBoneSet(dbBones: any[], dbSlots: any[], name: string): BoneSet {
+export function createBoneSet(dbBones: any[], dbSlots: any[], name: string): BoneSet {
 	const bones: Bone[] = [];
 
 	// ASAではソート属性が与えられないかぎり、boneの並び順で描画される。

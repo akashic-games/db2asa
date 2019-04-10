@@ -6,10 +6,7 @@
     "noImplicitAny": true,
     "outDir": "bin",
     "module": "commonjs",
-    "baseUrl": "./",
-    "paths": {
-      "dragonbones-data5.5": ["typings/db5.5-data"]
-    },
+    "baseUrl": "./"
   },
   "filesGlob": [
     "./typings/**/*.ts",

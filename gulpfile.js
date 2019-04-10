@@ -29,7 +29,8 @@ gulp.task("lint-md", function(){
 		.pipe(shell(["mdast <%= file.path %> --frail --no-stdout --quiet"]));
 });
 
-gulp.task("test", ["compile"], function(cb) {
+// gulp.task("test", ["compile"], function(cb) {
+gulp.task("test", gulp.series("compile", function (cb) {
 	var jasmineReporters = [
 		new Reporter({
 			isVerbose: false,
@@ -38,7 +39,7 @@ gulp.task("test", ["compile"], function(cb) {
 		}),
 		new reporters.JUnitXmlReporter()
 	];
-	gulp.src(["./lib/**/*.js"])
+	return gulp.src(["./lib/**/*.js"])
 		.pipe(istanbul())
 		.pipe(istanbul.hookRequire())
 		.on("finish", function() {
@@ -47,6 +48,6 @@ gulp.task("test", ["compile"], function(cb) {
 				.pipe(istanbul.writeReports({ reporters: ["text", "cobertura", "lcov"] }))
 				.on("end", cb);
 		});
-});
+}));
 
-gulp.task("default", ["compile"]);
+gulp.task("default", gulp.series("compile"));

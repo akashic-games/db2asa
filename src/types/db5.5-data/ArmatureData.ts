@@ -1,7 +1,8 @@
 import {AnimationData} from "./AnimationData";
 import * as cmnData from "./CommonData";
+export {cmnData};
 
-interface BoneData {
+export interface BoneData {
 	// The name of the bone.
 	name: string;
 	// The name of the parent bone. (Optional property, default: null)
