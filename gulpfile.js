@@ -29,7 +29,6 @@ gulp.task("lint-md", function(){
 		.pipe(shell(["mdast <%= file.path %> --frail --no-stdout --quiet"]));
 });
 
-// gulp.task("test", ["compile"], function(cb) {
 gulp.task("test", gulp.series("compile", function (cb) {
 	var jasmineReporters = [
 		new Reporter({

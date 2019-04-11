@@ -1,6 +1,6 @@
 import {Project, Options} from "./converter";
 import {Skin, AnimeParams} from "@akashic-extension/akashic-animation";
-import {DragonBonesData5_5, ArmatureData, BoneData } from "./types/db5.5-data";
+import {DragonBonesData5, ArmatureData, BoneData } from "./types/db5.5-data";
 import {AnimationData,
 		AnimationTimelineData,
 		AnimationTimelineDataCustom,
@@ -20,7 +20,7 @@ interface TempKeyFrameData {
 	data: FrameData | AnimationFrameData;
 }
 
-export function convertPromise(data: DragonBonesData5_5, pathToProj: string, project: Project, options: Options): Promise<Project> {
+export function convertPromise(data: DragonBonesData5, pathToProj: string, project: Project, options: Options): Promise<Project> {
 	return new Promise<Project>((resolve: (data: any) => void, reject: (error: any) => void) => {
 		recursive(path.join(pathToProj, "texture"), (err: Error, files: string[]) => {
 			if (!err) {

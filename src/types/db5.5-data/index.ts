@@ -4,7 +4,7 @@ export { ArmatureData, BoneData, cmnData};
 
 // DragonBones Data Version5.5
 // @see: https://github.com/DragonBones/Tools/blob/master/doc/dragonbones_json_format_5.5.md
-export interface DragonBonesData5_5 {
+export interface DragonBonesData5 {
 	// The name of the DragonBones data.
 	name: string;
 

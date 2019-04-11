@@ -6,7 +6,7 @@ import * as fs from "fs-extra";
 import * as sizeof from "image-size";
 import * as recursive from "recursive-readdir";
 import * as U from "./Utils";
-import {convertPromise} from "./converterVer55";
+import {convertPromise} from "./converterOverVer5";
 
 let vlog: U.Logger = undefined;
 

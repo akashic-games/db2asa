@@ -116,7 +116,7 @@ export interface AnimationTimelineData {
 	colorFrame?: AnimationFrameData[];
 }
 
-export interface AnimationTimelineDataCustom extends AnimationTimelineData{
+export interface AnimationTimelineDataCustom extends AnimationTimelineData {
 	tempFrame?: cmnData.TransformData[];
 	empty?: boolean;
 }

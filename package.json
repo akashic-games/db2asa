@@ -12,7 +12,7 @@
     "clean:typings": "gulp clean:typings",
     "clean": "gulp clean",
     "test": "gulp test lint lint-md",
-    "lint": "gulp lint lint-md"
+	"lint": "tslint -c tslint.json --project ./tsconfig.json"
   },
   "author": "DWANGO Co., Ltd.",
   "license": "MIT",
