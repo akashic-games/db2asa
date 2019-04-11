@@ -11,8 +11,8 @@
     "build": "gulp compile",
     "clean:typings": "gulp clean:typings",
     "clean": "gulp clean",
-	"test": "npm run test:jasmine && npm run lint",
-	"test:jasmine": "istanbul cover --report text --report html --colors -i ./lib/index.js ./node_modules/jasmine/bin/jasmine.js",
+    "test": "npm run test:jasmine && npm run lint",
+    "test:jasmine": "istanbul cover --report text --report html --colors -i ./lib/index.js ./node_modules/jasmine/bin/jasmine.js",
     "lint": "tslint -c tslint.json --project ./tsconfig.json"
   },
   "author": "DWANGO Co., Ltd.",
