@@ -4,12 +4,13 @@ import {DragonBonesData5, ArmatureData, BoneData } from "./types/db5.5-data";
 import {AnimationData,
 		AnimationTimelineData,
 		AnimationTimelineDataCustom,
-		 FrameData,
-		 AnimationFrameData} from "./types/db5.5-data/AnimationData";
+		FrameData,
+		AnimationFrameData} from "./types/db5.5-data/AnimationData";
 import * as recursive from "recursive-readdir";
 import * as path from "path";
 import * as sizeof from "image-size";
 import * as converter from "./converter";
+import * as convUtils from "./convUtils";
 
 interface KeyFrameDataObject {
 	data: any;
@@ -95,7 +96,7 @@ export function convertPromise(data: DragonBonesData5, pathToProj: string, proje
 				}
 
 				// store bonesets
-				const boneSet = converter.createBoneSet(armature.bone, armature.slot, armature.name);
+				const boneSet = convUtils.createBoneSet(armature.bone, armature.slot, armature.name);
 				project.boneSets.push(boneSet);
 
 				if (options.outputComboInfo) {
@@ -121,7 +122,7 @@ export function convertPromise(data: DragonBonesData5, pathToProj: string, proje
 				// store cell
 				for (let j = 0; j < project.skins.length; j++) {
 					const skin = project.skins[j];
-					const created = converter.createCellOnSkin(armature, skin);
+					const created = convUtils.createCellOnSkin(armature, skin);
 					if (created && options.outputComboInfo) {
 						combo.skinNames.push(skin.name);
 					}
@@ -233,7 +234,7 @@ function createAnimation(dbAnimation: AnimationData, fps: number, armature: Arma
 				keyFrame.time = data.duration;
 
 				// キーフレームの持つ値は基本姿勢からの差分の模様
-				const dbBone = converter.getBoneByName(bones, targetBoneData.name);
+				const dbBone = convUtils.getBoneByName(bones, targetBoneData.name);
 				const baseValue = dbBone.transform[dbAttr] || converter.defaultTransformValues[dbAttr];
 				let animValue = dbKeyFrame[dbAttr];
 				// 全てのデータにattrが入っていない(値が前と同じだと省略される)ため、attrがなければ前データのattrを参照しそれでも無ければデフォルト値とする
@@ -263,7 +264,7 @@ function createAnimation(dbAnimation: AnimationData, fps: number, armature: Arma
 					// akashic-animationは正規化されておらず、またそれぞれ始点と終点との相対値になっている。
 					// ここで変換する。
 					const sy = keyFrame.value;
-					let ey = converter.getBoneByName(bones, targetBoneData.name).transform[dbAttr] || 0;
+					let ey = convUtils.getBoneByName(bones, targetBoneData.name).transform[dbAttr] || 0;
 					const nextData: any = frameData[idx + 1];
 					ey += nextData[dbAttr] || converter.defaultTransformValues[dbAttr];
 
@@ -362,8 +363,8 @@ function createCellAnimation(dbSlotAnime: any, armature: any, boneName: string):
 		if (displayIndex !== -1) {
 			keyFrame.value = new AnimeParams.CellValue();
 			keyFrame.value.skinName = getDisplayImageName(armature, boneName, displayIndex);
-			const slotDetail = converter.getSlotDetailForBone(armature, boneName);
-			keyFrame.value.cellName = slotDetail.name + "_" + converter.normalizeDisplayName(slotDetail.display[displayIndex].name);
+			const slotDetail = convUtils.getSlotDetailForBone(armature, boneName);
+			keyFrame.value.cellName = slotDetail.name + "_" + convUtils.normalizeDisplayName(slotDetail.display[displayIndex].name);
 		} else { // 非表示
 			keyFrame.value = undefined;
 		}
@@ -385,7 +386,7 @@ function createCellAlphaAnimation(dbSlotAnime: any): AnimeParams.Curve<number> {
 
 		keyFrame.time = dbKeyFrame.duration;
 		// alpha値はアニメーション(colorFrame)の値を用いる
-		keyFrame.value = converter.getKeyFrameAlpha(dbKeyFrame.data);
+		keyFrame.value = convUtils.getKeyFrameAlpha(dbKeyFrame.data);
 
 		keyFrame.ipCurve = undefined;
 
@@ -402,7 +403,7 @@ function createCellAlphaAnimation(dbSlotAnime: any): AnimeParams.Curve<number> {
 			// akashic-animationは正規化されておらず、またそれぞれ始点と終点との相対値になっている。
 			// ここで変換する。
 			const sy = keyFrame.value;
-			const ey = converter.getKeyFrameAlpha(dbKeyFrames[i + 1]);
+			const ey = convUtils.getKeyFrameAlpha(dbKeyFrames[i + 1]);
 
 			const xScale = dbKeyFrame.duration;
 			const yScale = ey - sy;
@@ -428,7 +429,7 @@ function createCellAlphaAnimation(dbSlotAnime: any): AnimeParams.Curve<number> {
 
 // amature.slotと対になるアニメーションデータを返す
 function getSlotAnimeByBoneName(boneName: string, slotAnimes: any[], dbSlots: any[]): any {
-	const dbSlot = converter.getSlotForBone(boneName, dbSlots);
+	const dbSlot = convUtils.getSlotForBone(boneName, dbSlots);
 	if (dbSlot) {
 		if (slotAnimes != null) {
 			return slotAnimes;
@@ -448,11 +449,11 @@ function getSlotAnimeByBoneName(boneName: string, slotAnimes: any[], dbSlots: an
 
 // ボーンに配置される displayIndex番目のdisplay（画像）の名前を得る
 function getDisplayImageName(armature: any, boneName: string, displayIndex: number): string {
-	const slot = converter.getSlotDetailForBone(armature, boneName);
+	const slot = convUtils.getSlotDetailForBone(armature, boneName);
 	if (!slot) {
 		return undefined;
 	}
 	// 5.5ではdisplayデータに `type` がないためそのまま変換
-	return converter.normalizeDisplayName(slot.display[displayIndex].name);
+	return convUtils.normalizeDisplayName(slot.display[displayIndex].name);
 }
 

@@ -3,6 +3,7 @@
 const C = require("../bin/converter.js");
 const fs = require("fs");
 const path = require("path");
+const conv = require("../bin/converterV5Lower");
 
 describe("C.", function () {
 
@@ -51,7 +52,7 @@ describe("converter", function() {
 	describe("given stickman.json with less option", function() {
 		it("can convert all", function(done) {
 			project = new C.Project(false);
-			const promise = C.createConvertPromise(
+			const promise = conv.createConvertPromise(
 				data,
 				TARGET_DIR,
 				project,
@@ -106,7 +107,7 @@ describe("converter", function() {
 
 			project = new C.Project(true);
 			project.userData.combinationInfo = [];
-			promise = C.createConvertPromise(data, TARGET_DIR, project, options);
+			promise = conv.createConvertPromise(data, TARGET_DIR, project, options);
 		});
 
 		it("can convert animation", function(done) {
@@ -203,7 +204,7 @@ describe("converter", function() {
 			project = new C.Project(false);
 			project.name = path.basename(options.projFileName, ".json");
 
-			const promise = C.createConvertPromise(
+			const promise = conv.createConvertPromise(
 				data,
 				"spec/project/emptyman/",
 				project,
@@ -241,7 +242,7 @@ describe("converter", function() {
 
 
 		it("can convert all", function(done) {
-			const promise = C.createConvertPromise(data, "spec/project/nokeyman/", project, options);
+			const promise = conv.createConvertPromise(data, "spec/project/nokeyman/", project, options);
 
 			promise.then(
 				function(proj) {
