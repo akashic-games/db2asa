@@ -1,5 +1,37 @@
-import { Skin, Bone, BoneSet, Cell } from "@akashic-extension/akashic-animation";
+import {Skin, Bone, BoneSet, Cell} from "@akashic-extension/akashic-animation";
 import * as path from "path";
+
+// DragonBonesのtransform属性表
+export const dbTransformAttributes = [
+	"x", "y", "skX", "scX", "scY"
+];
+
+// Dragonbonsの属性ごとの合成演算関数テーブル
+export const dbTransformComposeOps: { [key: string]: (a: number, b: number) => number } = {
+	"x": (a: number, b: number) => a + b,
+	"y": (a: number, b: number) => a + b,
+	"skX": (a: number, b: number) => a + b,
+	"scX": (a: number, b: number) => a * b,
+	"scY": (a: number, b: number) => a * b
+};
+
+// DragonBonesのtransform属性の指定がないときに代替する値のテーブル
+export const defaultTransformValues: { [key: string]: any } = {
+	x: 0,
+	y: 0,
+	skX: 0,
+	scX: 1,
+	scY: 1
+};
+
+// DragonBonesの属性名を対応するakashic-animationの属性名に変換するテーブル
+export const dbAttr2asaAttr: { [key: string]: string } = {
+	x: "tx",
+	y: "ty",
+	skX: "rz",
+	scX: "sx",
+	scY: "sy"
+};
 
 export function createCellOnSkin(armature: any, skin: Skin): boolean {
 	// DBs上でarmatureあたり１つしか(DBs用語の)スキンを作れないはず

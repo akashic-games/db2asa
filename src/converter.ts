@@ -4,8 +4,8 @@ import { Skin, BoneSet, Container, AnimeParams } from "@akashic-extension/akashi
 import * as path from "path";
 import * as fs from "fs-extra";
 import * as U from "./Utils";
-import {createConvertPromise as convertPromiseV5Lower } from "./converterV5Lower";
-import {convertPromise as convertPromiseForV55} from "./converterForV55";
+import {convertPromise as convertPromiseForV5_0 } from "./converterForV5_0";
+import {convertPromise as convertPromiseForV5_5} from "./converterForV5_5";
 
 let vlog: U.Logger = undefined;
 
@@ -60,38 +60,6 @@ enum Prefix {
 	Anim
 }
 
-// DragonBonesのtransform属性表
-export const dbTransformAttributes = [
-	"x", "y", "skX", "scX", "scY"
-];
-
-// Dragonbonsの属性ごとの合成演算関数テーブル
-export const dbTransformComposeOps: {[key: string]: (a: number, b: number) => number} = {
-	"x":   (a: number, b: number) => a + b,
-	"y":   (a: number, b: number) => a + b,
-	"skX": (a: number, b: number) => a + b,
-	"scX": (a: number, b: number) => a * b,
-	"scY": (a: number, b: number) => a * b
-};
-
-// DragonBonesのtransform属性の指定がないときに代替する値のテーブル
-export const defaultTransformValues: {[key: string]: any} = {
-	x: 0,
-	y: 0,
-	skX: 0,
-	scX: 1,
-	scY: 1
-};
-
-// DragonBonesの属性名を対応するakashic-animationの属性名に変換するテーブル
-export const dbAttr2asaAttr: {[key: string]: string} = {
-	x: "tx",
-	y: "ty",
-	skX: "rz",
-	scX: "sx",
-	scY: "sy"
-};
-
 export function readFilePromise(options: Options): any {
 	return new Promise<void>(
 		(resolve: () => void, reject: (error: any) => void) => {
@@ -128,9 +96,9 @@ export function convert(options: Options): void {
 		.then(() => readFilePromise(options))
 		.then( (data) => {
 			if (data.version > 5.0) {
-				return convertPromiseForV55(data, pathToProj, project, options);
+				return convertPromiseForV5_5(data, pathToProj, project, options);
 			} else {
-				return convertPromiseV5Lower(data, pathToProj, project, options);
+				return convertPromiseForV5_0(data, pathToProj, project, options);
 			}
 		})
 		.then(

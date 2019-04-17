@@ -9,7 +9,6 @@ import {AnimationData,
 import * as recursive from "recursive-readdir";
 import * as path from "path";
 import * as sizeof from "image-size";
-import * as converter from "./converter";
 import * as convUtils from "./convUtils";
 
 interface KeyFrameDataObject {
@@ -22,7 +21,7 @@ interface TempKeyFrameData {
 }
 
 export function convertPromise(data: DragonBonesData5, pathToProj: string, project: Project, options: Options): Promise<Project> {
-	return new Promise<Project>((resolve: (data: any) => void, reject: (error: any) => void) => {
+	return new Promise<any>((resolve, reject) => {
 		recursive(path.join(pathToProj, "texture"), (err: Error, files: string[]) => {
 			if (!err) {
 				resolve({
@@ -40,30 +39,26 @@ export function convertPromise(data: DragonBonesData5, pathToProj: string, proje
 				reject(JSON.stringify(err));
 			}
 		});
-	}).then((dbAssets: any) => {
+	}).then((dbAssets) => {
 		if (dbAssets.files.length > 0) {
 			return Promise.all(dbAssets.files.map((file: string) => {
-				return new Promise<any>((resolve: (data: any) => void, reject: (error: any) => void) => {
+				return new Promise((resolve, reject) => {
 					sizeof(file, (err: Error, dimensions: any) => {
 						if (!err) {
 							dbAssets.textureInfo[file] = dimensions;
-							resolve(dbAssets);
+							resolve();
 						} else {
 							reject(err);
 						}
 					});
 				});
-			}));
+			})).then(() => dbAssets);
 		} else {
-			return Promise.all(<any>[
-				new Promise<any>((resolve: (data: any) => void, _reject: (error: any) => void) => {
-					resolve(dbAssets);
-				})
-			]);
+			return dbAssets;
 		}
 	}).then((results: any[]) => {
-		return new Promise<Project>((resolve: (proj: Project) => void) => {
-			const dbAssets: any = results[0];
+		return new Promise<Project>((resolve) => {
+			const dbAssets: any = results;
 			const armatures: ArmatureData[] = dbAssets.dragonbones.armature;
 			const textureInfo = dbAssets.textureInfo;
 
@@ -224,9 +219,9 @@ function createAnimation(dbAnimation: AnimationData, fps: number, armature: Arma
 		if (keyFrameDataObj.maxTime > maxTime)
 			maxTime = keyFrameDataObj.maxTime;
 
-		converter.dbTransformAttributes.forEach((dbAttr: string) => {
+		convUtils.dbTransformAttributes.forEach((dbAttr: string) => {
 			const curve = new AnimeParams.Curve<number>();
-			curve.attribute = converter.dbAttr2asaAttr[dbAttr];
+			curve.attribute = convUtils.dbAttr2asaAttr[dbAttr];
 
 			frameData.forEach((data, idx: number) => {
 				const dbKeyFrame: any = data.data;
@@ -235,7 +230,7 @@ function createAnimation(dbAnimation: AnimationData, fps: number, armature: Arma
 
 				// キーフレームの持つ値は基本姿勢からの差分の模様
 				const dbBone = convUtils.getBoneByName(bones, targetBoneData.name);
-				const baseValue = dbBone.transform[dbAttr] || converter.defaultTransformValues[dbAttr];
+				const baseValue = dbBone.transform[dbAttr] || convUtils.defaultTransformValues[dbAttr];
 				let animValue = dbKeyFrame[dbAttr];
 				// 全てのデータにattrが入っていない(値が前と同じだと省略される)ため、attrがなければ前データのattrを参照しそれでも無ければデフォルト値とする
 				if (!targetBoneData.empty && !dbKeyFrame[dbAttr]) {
@@ -248,9 +243,9 @@ function createAnimation(dbAnimation: AnimationData, fps: number, armature: Arma
 					}
 				}
 				if (!animValue || targetBoneData.empty)
-					animValue = converter.defaultTransformValues[dbAttr];
+					animValue = convUtils.defaultTransformValues[dbAttr];
 
-				keyFrame.value = converter.dbTransformComposeOps[dbAttr](baseValue, animValue);
+				keyFrame.value = convUtils.dbTransformComposeOps[dbAttr](baseValue, animValue);
 
 				if (dbKeyFrame.curve) { // ベジェ補間の情報がある
 					keyFrame.ipType = "bezier";
@@ -266,7 +261,7 @@ function createAnimation(dbAnimation: AnimationData, fps: number, armature: Arma
 					const sy = keyFrame.value;
 					let ey = convUtils.getBoneByName(bones, targetBoneData.name).transform[dbAttr] || 0;
 					const nextData: any = frameData[idx + 1];
-					ey += nextData[dbAttr] || converter.defaultTransformValues[dbAttr];
+					ey += nextData[dbAttr] || convUtils.defaultTransformValues[dbAttr];
 
 					const xScale = dbKeyFrame.duration;
 					const yScale = ey - sy;

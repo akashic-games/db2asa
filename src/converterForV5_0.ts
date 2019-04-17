@@ -3,12 +3,11 @@ import {Skin, AnimeParams} from "@akashic-extension/akashic-animation";
 import * as recursive from "recursive-readdir";
 import * as path from "path";
 import * as sizeof from "image-size";
-import * as converter from "./converter";
 import * as convUtils from "./convUtils";
 
-export function createConvertPromise(data: any, pathToProj: string, proj: Project, options: Options): Promise<Project> {
-	return new Promise<Project>(
-		(resolve: (data: any) => void, reject: (error: any) => void) => {
+export function convertPromise(data: any, pathToProj: string, proj: Project, options: Options): Promise<Project> {
+	return new Promise<any>(
+		(resolve, reject) => {
 			recursive(path.join(pathToProj, "texture"), (err: Error, files: string[]) => {
 				if (!err) {
 					resolve({
@@ -31,32 +30,25 @@ export function createConvertPromise(data: any, pathToProj: string, proj: Projec
 		(dbAssets: any) => {
 			if (dbAssets.files.length > 0) {
 				return Promise.all(dbAssets.files.map((file: string) => {
-					return new Promise<any>((resolve: (data: any) => void, reject: (error: any) => void) => {
-						// recursiveはフルパスを返すのでここではjoin()などせずそのまま用いる
+					return new Promise((resolve, reject) => {
 						sizeof(file, (err: Error, dimensions: any) => {
 							if (!err) {
 								dbAssets.textureInfo[file] = dimensions;
-								resolve(dbAssets);
+								resolve();
 							} else {
 								reject(err);
 							}
 						});
 					});
-				}));
+				})).then(() => dbAssets);
 			} else {
-				return Promise.all(<any>[
-					new Promise<any>((resolve: (data: any) => void, reject: (error: any) => void) => {
-						resolve(dbAssets);
-					})
-				]);
+				return dbAssets;
 			}
 		}
 	).then(
 		(results: any[]) => {
-			return new Promise<Project>((resolve: (proj: Project) => void) => {
-				// Promise.Allを経由するとめいめいの結果が配列に入る。
-				// どのpromiseも同じインスタンスを返すので配列のどの要素も同じインスタンスになる。
-				const dbAssets: any = results[0];
+			return new Promise<Project>((resolve) => {
+				const dbAssets: any = results;
 				const armatures: any[] = dbAssets.dragonbones.armature;
 				const textureInfo = dbAssets.textureInfo;
 
@@ -147,10 +139,10 @@ function createAnimation(dbAnimation: any, fps: number, armature: any, isUserDat
 		var curveTie = new AnimeParams.CurveTie();
 		curveTie.boneName = dbBoneAnime.name;
 
-		converter.dbTransformAttributes.forEach((dbAttr: string) => {
+		convUtils.dbTransformAttributes.forEach((dbAttr: string) => {
 			const dbKeyFrames: any[] = dbBoneAnime.frame;
 			const curve = new AnimeParams.Curve<number>();
-			curve.attribute = converter.dbAttr2asaAttr[dbAttr];
+			curve.attribute = convUtils.dbAttr2asaAttr[dbAttr];
 
 			let time = 0;
 			for (let j = 0; j < dbKeyFrames.length; j++) {
@@ -165,9 +157,9 @@ function createAnimation(dbAnimation: any, fps: number, armature: any, isUserDat
 
 				// キーフレームの持つ値は基本姿勢からの差分の模様
 				const dbBone = convUtils.getBoneByName(bones, dbBoneAnime.name);
-				const baseValue = dbBone.transform[dbAttr] || converter.defaultTransformValues[dbAttr];
-				const animValue = dbKeyFrame.transform[dbAttr] || converter.defaultTransformValues[dbAttr];
-				keyFrame.value = converter.dbTransformComposeOps[dbAttr](baseValue, animValue);
+				const baseValue = dbBone.transform[dbAttr] || convUtils.defaultTransformValues[dbAttr];
+				const animValue = dbKeyFrame.transform[dbAttr] || convUtils.defaultTransformValues[dbAttr];
+				keyFrame.value = convUtils.dbTransformComposeOps[dbAttr](baseValue, animValue);
 
 				if (dbKeyFrame.curve) { // ベジェ補間の情報がある
 					keyFrame.ipType = "bezier";
@@ -182,7 +174,7 @@ function createAnimation(dbAnimation: any, fps: number, armature: any, isUserDat
 					// ここで変換する。
 					const sy = keyFrame.value;
 					let ey = convUtils.getBoneByName(bones, dbBoneAnime.name).transform[dbAttr] || 0;
-					ey += dbKeyFrames[j + 1].transform[dbAttr] || converter.defaultTransformValues[dbAttr];
+					ey += dbKeyFrames[j + 1].transform[dbAttr] || convUtils.defaultTransformValues[dbAttr];
 
 					const xScale = dbKeyFrame.duration;
 					const yScale = ey - sy;
