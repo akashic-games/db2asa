@@ -46,9 +46,8 @@ export function convertPromise(data: any, pathToProj: string, proj: Project, opt
 			}
 		}
 	).then(
-		(results: any[]) => {
+		(dbAssets) => {
 			return new Promise<Project>((resolve) => {
-				const dbAssets: any = results;
 				const armatures: any[] = dbAssets.dragonbones.armature;
 				const textureInfo = dbAssets.textureInfo;
 

@@ -56,9 +56,8 @@ export function convertPromise(data: DragonBonesData5, pathToProj: string, proje
 		} else {
 			return dbAssets;
 		}
-	}).then((results: any[]) => {
+	}).then((dbAssets) => {
 		return new Promise<Project>((resolve) => {
-			const dbAssets: any = results;
 			const armatures: ArmatureData[] = dbAssets.dragonbones.armature;
 			const textureInfo = dbAssets.textureInfo;
 
