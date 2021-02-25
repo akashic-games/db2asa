@@ -6,7 +6,7 @@
     "db2asa": "bin/index.js"
   },
   "scripts": {
-    "prepublish": "npm run install:typings && gulp compile",
+    "prepare": "npm run install:typings && gulp compile",
     "install:typings": "gulp install:typings",
     "build": "gulp compile",
     "clean:typings": "gulp clean:typings",
