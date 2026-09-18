@@ -53,7 +53,7 @@
     "@akashic/akashic-engine": "~1.10.0",
     "commander": "^2.9.0",
     "fs-extra": "^0.26.2",
-    "image-size": "^0.5.0",
+    "image-size": "npm:image-size-next@1.2.2",
     "recursive-readdir": "^2.1.0"
   },
   "devEngines": {
