@@ -1,6 +1,9 @@
 "use strict"
 
 const C = require("../bin/converter.js");
+const fs = require("fs");
+const path = require("path");
+const conv = require("../bin/converterForV5_0");
 
 describe("C.", function () {
 
@@ -26,18 +29,35 @@ describe("C.", function () {
 });
 
 describe("converter", function() {
+	const FILE_PATH = "spec/project/stickman/stickman.json";
+	const TARGET_DIR = "spec/project/stickman/";
+	let options;
+	let data;
+	let project;
+	beforeEach(()=>{
+		if (!data)
+			data = JSON.parse(fs.readFileSync(FILE_PATH, "utf8"));
+
+		options = {
+			asaanLongName: false,
+			outputUserData: false,
+			outputComboInfo: false,
+			outputRelatedFileInfo: false,
+			prefixes: ["", "", "", ""],
+			outDir: "./",
+			projFileName: FILE_PATH
+		};
+	});
 
 	describe("given stickman.json with less option", function() {
 		it("can convert all", function(done) {
-			const promise = C.createConvertPromise({
-				asaanLongName: false,
-				outputUserData: false,
-				outputComboInfo: false,
-				outputRelatedFileInfo: false,
-				projFileName: "spec/project/stickman/stickman.json",
-				outDir: "./",
-				prefixes: ["", "", "", ""]
-			});
+			project = new C.Project(false);
+			const promise = conv.convertPromise(
+				data,
+				TARGET_DIR,
+				project,
+				options
+			);
 
 			promise.then(
 				function(proj) {
@@ -79,15 +99,15 @@ describe("converter", function() {
 		let promise;
 
 		beforeEach(function() {
-			promise = C.createConvertPromise({
-				asaanLongName: true,
-				outputUserData: true,
-				outputComboInfo: true,
-				outputRelatedFileInfo: true,
-				projFileName: "spec/project/stickman/stickman.json",
-				outDir: "./",
-				prefixes: ["pj_", "bn_", "sk_", "an_"]
-			});
+			options.asaanLongName = true,
+			options.outputUserData = true,
+			options.outputComboInfo = true,
+			options.outputRelatedFileInfo = true,
+			options.prefixes = ["pj_", "bn_", "sk_", "an_"]
+
+			project = new C.Project(true);
+			project.userData.combinationInfo = [];
+			promise = conv.convertPromise(data, TARGET_DIR, project, options);
 		});
 
 		it("can convert animation", function(done) {
@@ -175,19 +195,25 @@ describe("converter", function() {
 	});
 
 	describe("given emptyman.json with less option", function() {
+		beforeEach( ()=> {
+			options.projFileName = "spec/project/emptyman/emptyman.json"
+			data = JSON.parse(fs.readFileSync(options.projFileName, "utf8"));
+		})
+
 		it("can convert all", function(done) {
-			const promise = C.createConvertPromise({
-				asaanLongName: false,
-				outputUserData: false,
-				outputComboInfo: false,
-				outputRelatedFileInfo: false,
-				projFileName: "spec/project/emptyman/emptyman.json",
-				outDir: "./",
-				prefixes: ["", "", "", ""]
-			});
+			project = new C.Project(false);
+			project.name = path.basename(options.projFileName, ".json");
+
+			const promise = conv.convertPromise(
+				data,
+				"spec/project/emptyman/",
+				project,
+				options
+			);
 
 			promise.then(
 				function(proj) {
+
 					expect(proj).toBeDefined();
 					expect(proj.name).toBe("emptyman");
 					expect(proj.skins.length).toEqual(0);
@@ -206,16 +232,17 @@ describe("converter", function() {
 	});
 
 	describe("given nokeyman.json with less option", function() {
+
+		beforeEach(() => {
+			options.projFileName = "spec/project/nokeyman/nokeyman.json"
+			project = new C.Project(false);
+			project.name = path.basename(options.projFileName, ".json");
+			data = JSON.parse(fs.readFileSync(options.projFileName, "utf8"));
+		})
+
+
 		it("can convert all", function(done) {
-			const promise = C.createConvertPromise({
-				asaanLongName: false,
-				outputUserData: false,
-				outputComboInfo: false,
-				outputRelatedFileInfo: false,
-				projFileName: "spec/project/nokeyman/nokeyman.json",
-				outDir: "./",
-				prefixes: ["", "", "", ""]
-			});
+			const promise = conv.convertPromise(data, "spec/project/nokeyman/", project, options);
 
 			promise.then(
 				function(proj) {
